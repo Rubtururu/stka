@@ -1,11 +1,8 @@
-const { ethers } = require("ethers");
+// Asegúrate de que Metamask esté instalado en el navegador y que el usuario esté conectado
 
-// Dirección del contrato desplegado
-const contractAddress = "0xcdcB074b154e0d9f2d4A0f92a087EEF6F9D2b8e6";
-
-// ABI del contrato generado con Solidity
+const contractAddress = "0xcdcB074b154e0d9f2d4A0f92a087EEF6F9D2b8e6"; // Dirección del contrato desplegado
 const contractABI = [
-  // Añade aquí el ABI generado para tu contrato
+  // ABI del contrato generado con Solidity
   {
     "inputs": [],
     "name": "stake",
@@ -87,63 +84,139 @@ const contractABI = [
   }
 ];
 
-// Aquí configuramos el Signer para interactuar con la red de Ethereum (o la red donde esté desplegado el contrato)
-const signer = new ethers.Wallet("TU_CLAVE_PRIVADA");
+let signer, contract;
 
-// Crear instancia del contrato
-const contract = new ethers.Contract(contractAddress, contractABI, signer);
+// Verifica que el navegador tenga Metamask instalado y habilitado
+if (typeof window.ethereum !== 'undefined') {
+    console.log("Metamask está disponible");
 
+    // Establece el proveedor de Ethers.js usando Metamask
+    const provider = new ethers.BrowserProvider(window.ethereum);
+
+    // Conecta con Metamask
+    provider.send("eth_requestAccounts", []).then(() => {
+        signer = provider.getSigner();
+        contract = new ethers.Contract(contractAddress, contractABI, signer);
+        console.log("Conectado al contrato");
+    }).catch((err) => {
+        console.error("Error al conectar con Metamask:", err);
+    });
+} else {
+    console.log("Metamask no está instalado");
+}
+
+// Función para hacer stake de BNB
 async function stakeBNB(amount) {
-  const tx = await contract.stake({ value: ethers.utils.parseEther(amount.toString()) });
-  console.log("Transacción enviada:", tx.hash);
-  await tx.wait();
-  console.log("Stake completado");
+    if (!signer) {
+        alert("Conéctate con Metamask");
+        return;
+    }
+
+    try {
+        const tx = await contract.stake({
+            value: ethers.parseEther(amount.toString())
+        });
+        console.log("Transacción enviada:", tx.hash);
+        await tx.wait();
+        console.log("Stake completado");
+    } catch (error) {
+        console.error("Error al hacer stake:", error);
+    }
 }
 
+// Función para hacer unstake de BNB
 async function unstakeBNB(amount) {
-  const tx = await contract.unstake(ethers.utils.parseEther(amount.toString()));
-  console.log("Transacción enviada:", tx.hash);
-  await tx.wait();
-  console.log("Unstake completado");
+    if (!signer) {
+        alert("Conéctate con Metamask");
+        return;
+    }
+
+    try {
+        const tx = await contract.unstake(ethers.parseEther(amount.toString()));
+        console.log("Transacción enviada:", tx.hash);
+        await tx.wait();
+        console.log("Unstake completado");
+    } catch (error) {
+        console.error("Error al hacer unstake:", error);
+    }
 }
 
+// Función para reclamar recompensas
 async function claimRewards() {
-  const tx = await contract.claimRewards();
-  console.log("Transacción enviada:", tx.hash);
-  await tx.wait();
-  console.log("Recompensas reclamadas");
+    if (!signer) {
+        alert("Conéctate con Metamask");
+        return;
+    }
+
+    try {
+        const tx = await contract.claimRewards();
+        console.log("Transacción enviada:", tx.hash);
+        await tx.wait();
+        console.log("Recompensas reclamadas");
+    } catch (error) {
+        console.error("Error al reclamar recompensas:", error);
+    }
 }
 
+// Función para distribuir recompensas
 async function distributeRewards() {
-  const tx = await contract.distributeRewards();
-  console.log("Transacción enviada:", tx.hash);
-  await tx.wait();
-  console.log("Recompensas distribuidas");
+    if (!signer) {
+        alert("Conéctate con Metamask");
+        return;
+    }
+
+    try {
+        const tx = await contract.distributeRewards();
+        console.log("Transacción enviada:", tx.hash);
+        await tx.wait();
+        console.log("Recompensas distribuidas");
+    } catch (error) {
+        console.error("Error al distribuir recompensas:", error);
+    }
 }
 
+// Función para obtener los top 10 stakers
 async function getTopStakers() {
-  const [topStakers, topAmounts] = await contract.getTopStakers();
-  console.log("Top Stakers:", topStakers);
-  console.log("Top Amounts:", topAmounts);
+    if (!signer) {
+        alert("Conéctate con Metamask");
+        return;
+    }
+
+    try {
+        const [topStakers, topAmounts] = await contract.getTopStakers();
+        console.log("Top Stakers:", topStakers);
+        console.log("Top Amounts:", topAmounts);
+    } catch (error) {
+        console.error("Error al obtener top stakers:", error);
+    }
 }
 
+// Función para obtener el tiempo hasta la próxima recompensa
 async function getTimeUntilNextReward() {
-  const timeRemaining = await contract.getTimeUntilNextReward();
-  console.log("Tiempo restante para la próxima recompensa:", timeRemaining);
+    if (!signer) {
+        alert("Conéctate con Metamask");
+        return;
+    }
+
+    try {
+        const timeRemaining = await contract.getTimeUntilNextReward();
+        console.log("Tiempo restante para la próxima recompensa:", timeRemaining);
+    } catch (error) {
+        console.error("Error al obtener tiempo restante:", error);
+    }
 }
 
+// Función para obtener la recompensa diaria
 async function getDailyRewardAmount() {
-  const dailyReward = await contract.getDailyRewardAmount();
-  console.log("Recompensa diaria a distribuir:", ethers.utils.formatEther(dailyReward));
-}
+    if (!signer) {
+        alert("Conéctate con Metamask");
+        return;
+    }
 
-// Ejemplo de uso
-(async () => {
-  await stakeBNB(1); // Stake 1 BNB
-  await unstakeBNB(0.5); // Unstake 0.5 BNB
-  await claimRewards(); // Reclamar recompensas
-  await distributeRewards(); // Distribuir recompensas
-  await getTopStakers(); // Obtener los mejores 10 stakers
-  await getTimeUntilNextReward(); // Ver tiempo restante para recompensas
-  await getDailyRewardAmount(); // Ver recompensa diaria
-})();
+    try {
+        const dailyReward = await contract.getDailyRewardAmount();
+        console.log("Recompensa diaria a distribuir:", ethers.formatEther(dailyReward));
+    } catch (error) {
+        console.error("Error al obtener recompensa diaria:", error);
+    }
+}
