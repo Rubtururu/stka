@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goo Staking Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Goo Staking Dashboard</h1>
+        </header>
+
+        <section class="statistics">
+            <div class="stat">
+                <h2>Total Staked BNB</h2>
+                <p id="total-staked">0</p>
+            </div>
+            <div class="stat">
+                <h2>Reward Pool</h2>
+                <p id="reward-pool">0</p>
+            </div>
+            <div class="stat">
+                <h2>Daily Rewards</h2>
+                <p id="daily-rewards">0</p>
+            </div>
+            <div class="stat">
+                <h2>Time Until Next Rewards</h2>
+                <p id="time-until-rewards">00:00:00</p>
+            </div>
+        </section>
+
+        <section class="user-stat">
+            <h2>Your Staked BNB</h2>
+            <p id="user-staked">0</p>
+        </section>
+
+        <section class="actions">
+            <h2>Manage Your Stake</h2>
+            <input type="number" id="stake-amount" placeholder="Enter BNB amount" min="0" step="0.01">
+            <button id="stake-button">Stake</button>
+            <button id="unstake-button">Unstake</button>
+            <button id="claim-button">Claim Rewards</button>
+        </section>
+
+        <section class="leaderboard">
+            <h2>Top 10 Stakers</h2>
+            <ul id="leaderboard">
+                <!-- Top stakers will be dynamically added here -->
+            </ul>
+        </section>
+
+        <footer>
+            <p>Powered by Goo Staking</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
