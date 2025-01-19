@@ -1,7 +1,7 @@
 const { ethers } = require("ethers");
 
 // Dirección del contrato desplegado
-const contractAddress = "TU_DIRECCION_DE_CONTRATO";
+const contractAddress = "0xcdcB074b154e0d9f2d4A0f92a087EEF6F9D2b8e6";
 
 // ABI del contrato generado con Solidity
 const contractABI = [
