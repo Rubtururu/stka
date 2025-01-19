@@ -3,60 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goo Staking</title>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.6.9/dist/ethers.umd.min.js"></script>
-    <title>Goo Staking Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+    <script src="staking.js"></script> <!-- Asegúrate de que el archivo staking.js esté cargado correctamente -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            text-align: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #218838;
+        }
+        .input {
+            padding: 8px 10px;
+            margin: 10px;
+            width: 200px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .output {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Goo Staking Dashboard</h1>
-        </header>
+        <h1>Goo Staking DApp</h1>
+        
+        <div>
+            <h3>Stake BNB</h3>
+            <input type="number" id="stakeAmount" class="input" placeholder="Amount to stake (in BNB)" />
+            <button class="btn" onclick="stakeBNB(document.getElementById('stakeAmount').value)">Stake</button>
+        </div>
+        
+        <div>
+            <h3>Unstake BNB</h3>
+            <input type="number" id="unstakeAmount" class="input" placeholder="Amount to unstake (in BNB)" />
+            <button class="btn" onclick="unstakeBNB(document.getElementById('unstakeAmount').value)">Unstake</button>
+        </div>
+        
+        <div>
+            <h3>Claim Rewards</h3>
+            <button class="btn" onclick="claimRewards()">Claim</button>
+        </div>
+        
+        <div>
+            <h3>Distribute Rewards</h3>
+            <button class="btn" onclick="distributeRewards()">Distribute</button>
+        </div>
 
-        <section class="statistics">
-            <div class="stat">
-                <h2>Total Staked BNB</h2>
-                <p id="total-staked">0</p>
-            </div>
-            <div class="stat">
-                <h2>Reward Pool</h2>
-                <p id="reward-pool">0</p>
-            </div>
-            <div class="stat">
-                <h2>Daily Rewards</h2>
-                <p id="daily-rewards">0</p>
-            </div>
-            <div class="stat">
-                <h2>Time Until Next Rewards</h2>
-                <p id="time-until-rewards">00:00:00</p>
-            </div>
-        </section>
+        <div>
+            <h3>Top Stakers</h3>
+            <button class="btn" onclick="getTopStakers()">Get Top Stakers</button>
+            <div id="topStakersList" class="output"></div>
+        </div>
+        
+        <div>
+            <h3>Next Reward Timer</h3>
+            <button class="btn" onclick="getTimeUntilNextReward()">Check Time</button>
+            <div id="rewardTimer" class="output"></div>
+        </div>
 
-        <section class="user-stat">
-            <h2>Your Staked BNB</h2>
-            <p id="user-staked">0</p>
-        </section>
-
-        <section class="actions">
-            <h2>Manage Your Stake</h2>
-            <input type="number" id="stake-amount" placeholder="Enter BNB amount" min="0" step="0.01">
-            <button id="stake-button">Stake</button>
-            <button id="unstake-button">Unstake</button>
-            <button id="claim-button">Claim Rewards</button>
-        </section>
-
-        <section class="leaderboard">
-            <h2>Top 10 Stakers</h2>
-            <ul id="leaderboard">
-                <!-- Top stakers will be dynamically added here -->
-            </ul>
-        </section>
-
-        <footer>
-            <p>Powered by Goo Staking</p>
-        </footer>
+        <div>
+            <h3>Daily Reward Amount</h3>
+            <button class="btn" onclick="getDailyRewardAmount()">Check Daily Rewards</button>
+            <div id="dailyReward" class="output"></div>
+        </div>
     </div>
-
-    <script src="script.js"></script>
 </body>
 </html>
