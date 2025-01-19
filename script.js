@@ -1,30 +1,115 @@
-// Asegúrate de que Metamask esté instalado en el navegador y que el usuario esté conectado
+let provider, signer, contract;
 
-const contractAddress = "0xcdcB074b154e0d9f2d4A0f92a087EEF6F9D2b8e6"; // Dirección del contrato desplegado
-const contractABI = [{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"reward","type":"uint256"}],"name":"RewardClaimed","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Staked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Unstaked","type":"event"},{"inputs":[],"name":"DAY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"REWARD_RATE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"claimRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"distributeRewards","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getDailyRewardAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getTimeUntilNextReward","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getTopStakers","outputs":[{"internalType":"address[]","name":"","type":"address[]"},{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"lastRewardTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"rewardPool","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"stake","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"stakers","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalGoo","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalStaked","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"unstake","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"users","outputs":[{"internalType":"uint256","name":"stakedAmount","type":"uint256"},{"internalType":"uint256","name":"gooProduced","type":"uint256"},{"internalType":"uint256","name":"lastClaimed","type":"uint256"}],"stateMutability":"view","type":"function"},{"stateMutability":"payable","type":"receive"}];
+// Dirección del contrato y ABI del contrato (completos y correctos)
+const contractAddress = "0xcdcB074b154e0d9f2d4A0f92a087EEF6F9D2b8e6";
+const contractABI = [
+  // ABI del contrato generado con Solidity
+  {
+    "inputs": [],
+    "name": "stake",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "uint256", "name": "_amount", "type": "uint256"}],
+    "name": "unstake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claimRewards",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "distributeRewards",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTopStakers",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTimeUntilNextReward",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getDailyRewardAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "receive",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  }
+];
 
-let signer, contract;
-
-// Verifica que el navegador tenga Metamask instalado y habilitado
+// Verifica que Metamask esté disponible
 if (typeof window.ethereum !== 'undefined') {
     console.log("Metamask está disponible");
 
-    // Establece el proveedor de Ethers.js usando Metamask
-    const provider = new ethers.BrowserProvider(window.ethereum);
+    // Establece el proveedor usando Metamask
+    provider = new ethers.BrowserProvider(window.ethereum);
 
-    // Conecta con Metamask
+    // Solicita la conexión a Metamask (solo una vez)
     provider.send("eth_requestAccounts", []).then(() => {
-        signer = provider.getSigner();
+        signer = provider.getSigner();  // Obtén el firmante de Metamask
+        console.log("Cuenta conectada:", signer);
+
+        // Conecta al contrato
         contract = new ethers.Contract(contractAddress, contractABI, signer);
-        console.log("Conectado al contrato");
-    }).catch((err) => {
-        console.error("Error al conectar con Metamask:", err);
+        console.log("Contrato conectado");
+    }).catch((error) => {
+        console.error("Error al conectar con Metamask:", error);
+        alert("Error al conectar con Metamask. Asegúrate de que Metamask esté instalado y conectado.");
     });
 } else {
     console.log("Metamask no está instalado");
+    alert("Metamask no está instalado. Instálalo para interactuar con el contrato.");
 }
 
-// Función para hacer stake de BNB
+// Función para hacer stake
 async function stakeBNB(amount) {
     if (!signer) {
         alert("Conéctate con Metamask");
@@ -32,18 +117,24 @@ async function stakeBNB(amount) {
     }
 
     try {
+        console.log("Iniciando transacción de stake...");
+
+        // Realiza el stake (conviértelo en un formato adecuado)
         const tx = await contract.stake({
             value: ethers.parseEther(amount.toString())
         });
         console.log("Transacción enviada:", tx.hash);
+
+        // Espera la confirmación de la transacción
         await tx.wait();
         console.log("Stake completado");
     } catch (error) {
         console.error("Error al hacer stake:", error);
+        alert("Error al hacer stake. Intenta nuevamente.");
     }
 }
 
-// Función para hacer unstake de BNB
+// Función para hacer unstake
 async function unstakeBNB(amount) {
     if (!signer) {
         alert("Conéctate con Metamask");
@@ -51,12 +142,18 @@ async function unstakeBNB(amount) {
     }
 
     try {
+        console.log("Iniciando transacción de unstake...");
+
+        // Realiza el unstake
         const tx = await contract.unstake(ethers.parseEther(amount.toString()));
         console.log("Transacción enviada:", tx.hash);
+
+        // Espera la confirmación
         await tx.wait();
         console.log("Unstake completado");
     } catch (error) {
         console.error("Error al hacer unstake:", error);
+        alert("Error al hacer unstake. Intenta nuevamente.");
     }
 }
 
@@ -68,12 +165,18 @@ async function claimRewards() {
     }
 
     try {
+        console.log("Reclamando recompensas...");
+
+        // Llama a la función de reclamar recompensas
         const tx = await contract.claimRewards();
         console.log("Transacción enviada:", tx.hash);
+
+        // Espera la confirmación
         await tx.wait();
         console.log("Recompensas reclamadas");
     } catch (error) {
         console.error("Error al reclamar recompensas:", error);
+        alert("Error al reclamar recompensas. Intenta nuevamente.");
     }
 }
 
@@ -85,16 +188,22 @@ async function distributeRewards() {
     }
 
     try {
+        console.log("Distribuyendo recompensas...");
+
+        // Llama a la función para distribuir recompensas
         const tx = await contract.distributeRewards();
         console.log("Transacción enviada:", tx.hash);
+
+        // Espera la confirmación
         await tx.wait();
         console.log("Recompensas distribuidas");
     } catch (error) {
         console.error("Error al distribuir recompensas:", error);
+        alert("Error al distribuir recompensas. Intenta nuevamente.");
     }
 }
 
-// Función para obtener los top 10 stakers
+// Función para obtener los top stakers
 async function getTopStakers() {
     if (!signer) {
         alert("Conéctate con Metamask");
@@ -106,7 +215,8 @@ async function getTopStakers() {
         console.log("Top Stakers:", topStakers);
         console.log("Top Amounts:", topAmounts);
     } catch (error) {
-        console.error("Error al obtener top stakers:", error);
+        console.error("Error al obtener los top stakers:", error);
+        alert("Error al obtener los top stakers.");
     }
 }
 
@@ -121,7 +231,8 @@ async function getTimeUntilNextReward() {
         const timeRemaining = await contract.getTimeUntilNextReward();
         console.log("Tiempo restante para la próxima recompensa:", timeRemaining);
     } catch (error) {
-        console.error("Error al obtener tiempo restante:", error);
+        console.error("Error al obtener el tiempo restante:", error);
+        alert("Error al obtener el tiempo restante.");
     }
 }
 
@@ -136,6 +247,7 @@ async function getDailyRewardAmount() {
         const dailyReward = await contract.getDailyRewardAmount();
         console.log("Recompensa diaria a distribuir:", ethers.formatEther(dailyReward));
     } catch (error) {
-        console.error("Error al obtener recompensa diaria:", error);
+        console.error("Error al obtener la recompensa diaria:", error);
+        alert("Error al obtener la recompensa diaria.");
     }
 }
